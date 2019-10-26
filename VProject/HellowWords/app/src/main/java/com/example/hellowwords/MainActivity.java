@@ -20,7 +20,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash);
-        Toolbar toolbar = findViewById(R.id.toolbar);
 
         new Handler().postDelayed(new Runnable() {
             @Override
