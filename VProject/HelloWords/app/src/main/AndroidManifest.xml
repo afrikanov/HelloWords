@@ -9,8 +9,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+        </activity>
         <activity
-            android:name="com.example.hellowords.MainActivity"
+            android:name=".HeadbandActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -20,15 +22,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.hellowords.LearnAcrivity"
+            android:name=".LearnAcrivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.example.hellowords.HomeActivity"
+            android:name=".HomeActivity"
             android:label="@string/title_activity_home"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.example.hellowords.LearnGrammar"
+            android:name=".LearnGrammar"
             android:label="@string/title_activity_home"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>

@@ -1,29 +1,20 @@
 package com.example.hellowords;
 
-import android.content.Intent;
-import android.os.Bundle;
-
-import com.example.hellowords.R;
-
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Handler;
-
-import java.util.ArrayList;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.splash);
+        setContentView(R.layout.activity_main);
+    }
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Intent i = new Intent(MainActivity.this, LearnGrammar.class);
-                startActivity(i);
-                finish();
-            }
-        }, 3 * 1000);
+    public void openCounter(View view) {
+        startActivity(new Intent(this, LearnAcrivity.class));
     }
 }
