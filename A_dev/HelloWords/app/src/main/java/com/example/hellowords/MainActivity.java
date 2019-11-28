@@ -53,12 +53,6 @@ public class MainActivity extends Activity {
         itemSettings = findViewById(R.id.action_settings);
         itemStatistics = findViewById(R.id.action_statistics);
 
-        mainActivity = findViewById(R.id.mainActivity);
-        learnActivity = findViewById(R.id.learnActivity);
-
-        mainActivity.setVisibility(View.VISIBLE);
-        learnActivity.setVisibility(View.GONE);
-
         BottomNavigationView bottomNavigationView = (BottomNavigationView)
                 findViewById(R.id.bottom_navigation);
 
@@ -70,17 +64,13 @@ public class MainActivity extends Activity {
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.action_main:
-                                //startActivity(new Intent(MainActivity.this, MainActivity.class));
-                                mainActivity.setVisibility(View.VISIBLE);
-                                learnActivity.setVisibility(View.GONE);
+                                startActivity(new Intent(MainActivity.this, MainActivity.class));
                                 return true;
                             case R.id.action_statistics:
-                                mainActivity.setVisibility(View.GONE);
-                                learnActivity.setVisibility(View.VISIBLE);
-                                //startActivity(new Intent(MainActivity.this, ));
+                                startActivity(new Intent(MainActivity.this, Statistics.class));
                                 return true;
                             case R.id.action_settings:
-                                //loadFragment(NotificationsFragment.newInstance());
+                                startActivity(new Intent(MainActivity.this, Settings.class));
                                 return true;
                         }
                         return false;
@@ -91,5 +81,11 @@ public class MainActivity extends Activity {
 
     public void openCounter(View view) {
         startActivity(new Intent(this, LearnActivity.class));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        overridePendingTransition(0,0);
     }
 }

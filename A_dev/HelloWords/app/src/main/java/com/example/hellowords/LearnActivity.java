@@ -1,16 +1,21 @@
 package com.example.hellowords;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -92,6 +97,30 @@ public class LearnActivity extends AppCompatActivity {
                 }
             }
         });
+
+        BottomNavigationView bottomNavigationView = (BottomNavigationView)
+                findViewById(R.id.bottom_navigation);
+
+        bottomNavigationView.setSelectedItemId(R.id.action_main);
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(
+                new BottomNavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.action_main:
+                                startActivity(new Intent(LearnActivity.this, MainActivity.class));
+                                return true;
+                            case R.id.action_statistics:
+                                startActivity(new Intent(LearnActivity.this, Statistics.class));
+                                return true;
+                            case R.id.action_settings:
+                                startActivity(new Intent(LearnActivity.this, Settings.class));
+                                return true;
+                        }
+                        return false;
+                    }
+                });
     }
 
     private void showCurrent() {
@@ -100,5 +129,11 @@ public class LearnActivity extends AppCompatActivity {
         answerTV.setText(ruWords.get(position));
         questionTV.startAnimation(animAlpha);
         questionTV.setText(enWords.get(position));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        overridePendingTransition(0,0);
     }
 }

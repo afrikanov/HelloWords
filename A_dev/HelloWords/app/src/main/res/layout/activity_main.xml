@@ -9,38 +9,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <LinearLayout
+    <Button
+        android:id="@+id/learnButton"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:onClick="openCounter"
         android:layout_weight="1"
-        android:id="@+id/mainActivity">
-
-        <Button
-            android:id="@+id/learnButton"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:onClick="openCounter"
-            android:text="continue studying"
-            android:textSize="50sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_weight="1"
-        android:id="@+id/learnActivity">
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:onClick="openCounter"
-            android:text="DONT studying"
-            android:textSize="50sp" />
-    </LinearLayout>
+        android:text="continue studying"
+        android:textSize="50sp" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
@@ -51,15 +28,7 @@
         app:itemHorizontalTranslationEnabled="false"
         app:itemIconTint="@color/bottom_navigation_item_background_colors"
         app:itemTextColor="@color/bottom_navigation_item_background_colors"
-        app:menu="@menu/menu_bottom_navigation"
-        app:ntb_badge_gravity="top"
-        app:ntb_badge_position="right"
-        app:ntb_badged="true"
-        app:ntb_scaled="true"
-        app:ntb_swiped="true"
-        app:ntb_tinted="true"
-        app:ntb_title_mode="all"
-        app:ntb_titled="true" />
+        app:menu="@menu/menu_bottom_navigation" />
 
     <!--<LinearLayout
         android:layout_width="match_parent"
