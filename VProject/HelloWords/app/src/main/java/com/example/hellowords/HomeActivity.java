@@ -64,10 +64,11 @@ public class HomeActivity extends AppCompatActivity {
         button2 = findViewById(R.id.secondButton);
         button3 = findViewById(R.id.thirdButton);
         button4 = findViewById(R.id.fourthButton);
-        if (getValue() == 0)
+        if (getValue() == 0) {
             updateValue(getValue());
-        else
+        } else {
             updateValue(getValue() - 1);
+        }
         findViewById(R.id.firstButton).setOnClickListener(v -> {
             if (button1.getText().equals(textValue)) {
                 Snackbar.make(v, "Your answer is true", Snackbar.LENGTH_SHORT).show();
