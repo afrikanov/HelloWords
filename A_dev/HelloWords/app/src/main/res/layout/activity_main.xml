@@ -1,23 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    tools:context=".MainActivity"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <Button
-        android:id="@+id/learnButton"
+    <LinearLayout
+        android:id="@+id/preparing"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:onClick="openCounter"
         android:layout_weight="1"
-        android:text="continue studying"
-        android:textSize="50sp" />
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/textWord"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="30"
+            android:background="@color/colorDefaultButton"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:textSize="40sp"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="110"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/knowButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/colorKnowButton"
+                android:text="I know"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/dknowButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/colorDKnowButton"
+                android:text="I don't know"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!--CHECKKKKKKKKKKKKKKKKKKKKKKKKKK-->
+
+    <LinearLayout
+        android:id="@+id/testing"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@color/colorDefaultButton"
+        android:orientation="vertical"
+        android:weightSum="100">
+
+        <TextView
+            android:id="@+id/wordValueTV"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="30"
+            android:background="@color/colorDefaultButton"
+            android:gravity="center"
+            android:text="Breakfast"
+            android:textColor="@android:color/background_dark"
+            android:textSize="50sp" />
+
+        <EditText
+            android:id="@+id/translationET"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="30"
+            android:gravity="center"
+            android:hint="Введите перевод"
+            android:inputType="textPersonName"
+            android:textColor="@android:color/background_dark"
+            android:textSize="30sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="40"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/checkButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/colorDefaultButton"
+                android:gravity="center"
+                android:text="Проверить"
+                android:textSize="30sp"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/hint"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/colorDefaultButton"
+                android:text="Подсказка"
+                android:textSize="30sp"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/nextWordButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/colorDefaultButton"
+                android:text="Далее"
+                android:textSize="30sp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/listenWordButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:background="@color/colorDefaultButton"
+                android:text="Прослушать"
+                android:textSize="30sp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
@@ -29,39 +149,5 @@
         app:itemIconTint="@color/bottom_navigation_item_background_colors"
         app:itemTextColor="@color/bottom_navigation_item_background_colors"
         app:menu="@menu/menu_bottom_navigation" />
-
-    <!--<LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="90"
-        android:textColor="@android:color/background_dark">
-
-        <Button
-            android:id="@+id/firstButton"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Main"
-            android:textSize="20sp" />
-
-        <Button
-            android:id="@+id/secondButton"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Settings"
-            android:textSize="20sp" />
-
-        <Button
-            android:id="@+id/thirdButton"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Statistics"
-            android:textSize="20sp" />
-    </LinearLayout>-->
 
 </LinearLayout>
