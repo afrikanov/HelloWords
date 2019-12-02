@@ -1,11 +1,15 @@
 package com.example.hellowords;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
@@ -26,8 +30,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
-public class MainActivity extends AppCompatActivity {
+import ru.yandex.speechkit.Emotion;
+import ru.yandex.speechkit.Error;
+import ru.yandex.speechkit.Language;
+import ru.yandex.speechkit.OnlineVocalizer;
+import ru.yandex.speechkit.SpeechKit;
+import ru.yandex.speechkit.Synthesis;
+import ru.yandex.speechkit.Vocalizer;
+import ru.yandex.speechkit.VocalizerListener;
+import ru.yandex.speechkit.Voice;
+
+public class MainActivity extends AppCompatActivity implements VocalizerListener {
     private static ArrayList<String> enWords = new ArrayList<>();
     private static ArrayList<String> ruWords = new ArrayList<>();
     private static int knowWordsMaxSize = 20;
@@ -52,6 +67,9 @@ public class MainActivity extends AppCompatActivity {
     EditText translationET;
     private static int newWordsAmount = 0;
     private int repetitionWordsAmount = 0;
+    //private static final String API_KEY_SPEECH_KIT = "c91e372b-c94d-46ef-8020-b2f2bbb16aa1";
+    private static final String API_KEY_SPEECH_KIT = "069b6659-984b-4c5f-880e-aaedcfd84102";
+    private Vocalizer vocalizer;
 
     private DBHelper mDBHelper;
     private SQLiteDatabase mDB;
@@ -72,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             mDBHelper.updateDataBase();
         } catch (IOException mIOException) {
-            throw new Error("UnableToUpdateDatabase");
+
         }
 
         try {
@@ -300,6 +318,7 @@ public class MainActivity extends AppCompatActivity {
         nextWordButton.setVisibility(View.VISIBLE);
         checkButton.setVisibility(View.GONE);
         hintButton.setVisibility(View.GONE);
+
         final Animation animAlpha = AnimationUtils.loadAnimation(getBaseContext(), R.anim.alpha);
         translationET.startAnimation(animAlpha);
         if (answer.equals(userWord)) {
@@ -317,6 +336,31 @@ public class MainActivity extends AppCompatActivity {
             }
             System.out.println();
         }
+
+        listenWordButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    SpeechKit.getInstance().init(getApplicationContext(), API_KEY_SPEECH_KIT);
+                    SpeechKit.getInstance().setUuid(UUID.randomUUID().toString());
+                } catch (SpeechKit.LibraryInitializationException ignored) {
+                    throw new RuntimeException();
+                }
+                System.out.println(56);
+                vocalizer = new OnlineVocalizer.Builder(Language.ENGLISH, MainActivity.this)
+                        .setEmotion(Emotion.GOOD)
+                        .setVoice(Voice.ZAHAR)
+                        .setAutoPlay(true)
+                        .build();
+                vocalizer.prepare();
+                if (TextUtils.isEmpty(answer)) {
+                    Toast.makeText(getApplicationContext(), "Write smth to be vocalized!", Toast.LENGTH_SHORT).show();
+                } else {
+                    vocalizer.synthesize(answer, Vocalizer.TextSynthesizingMode.INTERRUPT);
+                }
+                System.out.println(isOnline(getApplicationContext()));
+            }
+        });
 
         nextWordButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -349,4 +393,40 @@ public class MainActivity extends AppCompatActivity {
         preparing.setVisibility(View.VISIBLE);
     }
 
+    @Override
+    public void onSynthesisDone(@NonNull Vocalizer vocalizer) {
+
+    }
+
+    @Override
+    public void onPartialSynthesis(@NonNull Vocalizer vocalizer, @NonNull Synthesis synthesis) {
+
+    }
+
+    @Override
+    public void onPlayingBegin(@NonNull Vocalizer vocalizer) {
+
+    }
+
+    @Override
+    public void onPlayingDone(@NonNull Vocalizer vocalizer) {
+        Toast.makeText(getApplicationContext(), "FINISH", Toast.LENGTH_LONG);
+    }
+
+    @Override
+    public void onVocalizerError(@NonNull Vocalizer vocalizer, @NonNull Error error) {
+
+    }
+
+    public static boolean isOnline(Context context)
+    {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        if (netInfo != null && netInfo.isConnectedOrConnecting())
+        {
+            return true;
+        }
+        return false;
+    }
 }
