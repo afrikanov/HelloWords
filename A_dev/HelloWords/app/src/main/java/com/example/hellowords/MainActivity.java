@@ -16,6 +16,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
     private LinearLayout testing;
     private Button checkButton;
     Button hintButton;
-    Button listenWordButton;
+    ImageButton listenWordButton;
     Button nextWordButton;
     TextView wordValueTV;
     EditText translationET;
@@ -271,6 +272,7 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
     String ruWordNow;
 
     private void startTesting() {
+        listenWordButton.setVisibility(View.GONE);
         preparing.setVisibility(View.GONE);
         testing.setVisibility(View.VISIBLE);
         enWordsCollection = new ArrayList<>(enWords);
@@ -340,13 +342,14 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
         listenWordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final Animation animAlpha = AnimationUtils.loadAnimation(getBaseContext(), R.anim.alpha);
+                listenWordButton.startAnimation(animAlpha);
                 try {
                     SpeechKit.getInstance().init(getApplicationContext(), API_KEY_SPEECH_KIT);
                     SpeechKit.getInstance().setUuid(UUID.randomUUID().toString());
                 } catch (SpeechKit.LibraryInitializationException ignored) {
                     throw new RuntimeException();
                 }
-                System.out.println(56);
                 vocalizer = new OnlineVocalizer.Builder(Language.ENGLISH, MainActivity.this)
                         .setEmotion(Emotion.GOOD)
                         .setVoice(Voice.ZAHAR)
