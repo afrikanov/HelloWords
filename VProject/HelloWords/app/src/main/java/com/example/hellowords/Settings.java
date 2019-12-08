@@ -10,26 +10,25 @@ import android.view.MenuItem;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
-public class Statistics extends AppCompatActivity {
+public class Settings extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics);
-        List<StatisticsElement> list = new ArrayList<>();
-        list.add(new StatisticsElement("Number of hours", 0));
-        list.add(new StatisticsElement("Number of hours:", 0));
-        list.add(new StatisticsElement("Number of bad answers:", 0));
-        StatisticsList counterList = new StatisticsList(findViewById(R.id.list));
-        counterList.setStatistics(list);
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView)
                 findViewById(R.id.bottom_navigation);
-
-        bottomNavigationView.setSelectedItemId(R.id.action_statistics);
+        List<SettingsElement> list = new ArrayList<>();
+        list.add(new SettingsElement(1, "World"));
+        list.add(new SettingsElement(2, "Study"));
+        list.add(new SettingsElement(3, "Animals"));
+        SettingsList counterList = new SettingsList(findViewById(R.id.list));
+        counterList.setStatistics(list);
+        bottomNavigationView.setSelectedItemId(R.id.action_settings);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -37,18 +36,19 @@ public class Statistics extends AppCompatActivity {
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.action_main:
-                                startActivity(new Intent(Statistics.this, MainActivity.class));
+                                startActivity(new Intent(Settings.this, MainActivity.class));
                                 return true;
                             case R.id.action_statistics:
-                                startActivity(new Intent(Statistics.this, Statistics.class));
+                                startActivity(new Intent(Settings.this, Statistics.class));
                                 return true;
                             case R.id.action_settings:
-                                startActivity(new Intent(Statistics.this, Settings.class));
+                                startActivity(new Intent(Settings.this, Settings.class));
                                 return true;
                         }
                         return false;
                     }
                 });
+
     }
 
     @Override
