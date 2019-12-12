@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
         wordTV = findViewById(R.id.textWord);
         knowButton = findViewById(R.id.knowButton);
         dknowButton = findViewById(R.id.dknowButton);
-        mDBHelper = new DBHelper(this);
+        mDBHelper = new DBHelper(this, "wordsDB.db");
         try {
             mDBHelper.updateDataBase();
         } catch (IOException mIOException) {
@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
         }
 
         selectSQL = "SELECT * FROM dictionary WHERE _id BETWEEN 1 AND 1";
-        cursorPosition = 10;
+        cursorPosition = 1;
         cursor = mDB.rawQuery(selectSQL, null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -323,7 +323,9 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
 
         final Animation animAlpha = AnimationUtils.loadAnimation(getBaseContext(), R.anim.alpha);
         translationET.startAnimation(animAlpha);
+        boolean isRight = false;
         if (answer.equals(userWord)) {
+            isRight = true;
             translationET.setBackgroundResource(R.color.colorKnowButton);
             enWordsCollection.remove(answer);
             ruWordsCollection.remove(wordValueTV.getText().toString());
@@ -354,6 +356,7 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
                         .setEmotion(Emotion.GOOD)
                         .setVoice(Voice.ZAHAR)
                         .setAutoPlay(true)
+                        .setSpeed(0.5f)
                         .build();
                 vocalizer.prepare();
                 if (TextUtils.isEmpty(answer)) {
@@ -361,13 +364,18 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
                 } else {
                     vocalizer.synthesize(answer, Vocalizer.TextSynthesizingMode.INTERRUPT);
                 }
-                System.out.println(isOnline(getApplicationContext()));
             }
         });
 
+        boolean finalIsRight = isRight;
         nextWordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (finalIsRight) {
+                    Intent intent = new Intent(MainActivity.this, RecognizerActivity.class);
+                    intent.putExtra("word", answer);
+                    startActivity(intent);
+                }
                 if (ruWordsCollection.size() == 0) {
                     Toast.makeText(getApplicationContext(), "Молодец! За сегодня ты узнал " + newWordsAmount + " новых слов и повторил " + repetitionWordsAmount + " слов.", Toast.LENGTH_SHORT).show();
                     startLearning();
