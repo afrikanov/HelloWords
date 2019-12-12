@@ -407,7 +407,6 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
                 hintsAmount = 0;
             }
         });
-
     }
 
     private void startLearning() {
