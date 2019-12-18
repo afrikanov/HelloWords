@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    tools:context="com.example.hellowords.HomeActivity"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <TextView
+        android:id="@+id/wordValueTV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@android:color/background_dark"
+        android:layout_weight="3"
+        tools:text="Breakfast"
+        android:textSize="80sp" />
+
+    <LinearLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_weight="1"
+        android:textColor="@android:color/background_dark">
+        <Button
+            android:id="@+id/firstButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            tools:text="Завтрак"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:textSize="30sp"/>
+        <Button
+            android:id="@+id/secondButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            tools:text="Утро"
+            android:gravity="center"
+            android:textSize="30sp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_weight="1"
+        android:textColor="@android:color/background_dark">
+        <Button
+            android:id="@+id/thirdButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            tools:text="Перерыв"
+            android:gravity="center"
+            android:textSize="30sp"/>
+        <Button
+            android:id="@+id/fourthButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            tools:text="Обед"
+            android:gravity="center"
+            android:textSize="30sp"/>
+    </LinearLayout>
+</LinearLayout>
