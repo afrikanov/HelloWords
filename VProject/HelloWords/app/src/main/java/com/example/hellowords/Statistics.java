@@ -19,6 +19,9 @@ import java.util.List;
 public class Statistics extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private SharedPreferences sharedPreferences2;
+    private int answers;
+    private int correctanswers;
+    private int incorrectAnswers;
     public static final String APP_PREFERENCES = "myWindow";
     public static final String APP_PREFERENCES2 = "ifEmpty";
     private static int number = 0;
@@ -28,9 +31,15 @@ public class Statistics extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics);
         List<StatisticsElement> list = new ArrayList<>();
-        list.add(new StatisticsElement("Number of correct answers:", 4));
-        list.add(new StatisticsElement("Number of incorrect answers:", 3));
-        list.add(new StatisticsElement("Number of answers:", 7));
+        Bundle arguments = getIntent().getExtras();
+
+        if(arguments != null){
+            answers = arguments.getInt("NumberOfAnswers");
+            correctanswers = arguments.getInt("NumberOfCorrectAnswers");
+        }
+        list.add(new StatisticsElement("Number of correct answers:", correctanswers));
+        list.add(new StatisticsElement("Number of incorrect answers:", answers - correctanswers));
+        list.add(new StatisticsElement("Number of answers:", answers));
         StatisticsList counterList = new StatisticsList(findViewById(R.id.list));
         counterList.setStatistics(list);
 

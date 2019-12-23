@@ -59,6 +59,10 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
     public static final String APP_PREFERENCES2 = "EnglishWords";
     private SharedPreferences sharedPreferences3;
     public static final String APP_PREFERENCES3 = "RussianWords";
+    private SharedPreferences sharedPreferences4;
+    public static final String APP_PREFERENCES4 = "NumberOfAnswers";
+    private SharedPreferences sharedPreferences5;
+    public static final String APP_PREFERENCES5 = "NumberOfCorrectAnswers";
     private static int window = 1;
     private TextView wordTV;
     private Button knowButton;
@@ -130,6 +134,9 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
         sharedPreferences =  getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         sharedPreferences2 =  getSharedPreferences(APP_PREFERENCES2, Context.MODE_PRIVATE);
         sharedPreferences3 =  getSharedPreferences(APP_PREFERENCES3, Context.MODE_PRIVATE);
+        sharedPreferences4 =  getSharedPreferences(APP_PREFERENCES4, Context.MODE_PRIVATE);
+        sharedPreferences5 =  getSharedPreferences(APP_PREFERENCES5, Context.MODE_PRIVATE);
+        putInt(0);
         isTest = getInt();
         if (isTest == 1) {
             startTesting(getEnglishSet(), getRussianSet());
@@ -219,7 +226,10 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
                                 //startActivity(new Intent(MainActivity.this, MainActivity.class));
                                 return true;
                             case R.id.action_statistics:
-                                startActivity(new Intent(MainActivity.this, Statistics.class));
+                                Intent intent = new Intent(MainActivity.this, Statistics.class);
+                                intent.putExtra(APP_PREFERENCES4, getAnswers());
+                                intent.putExtra(APP_PREFERENCES5, getCorrectAnswers());
+                                startActivity(intent);
                                 return true;
                             case R.id.action_settings:
                                 startActivity(new Intent(MainActivity.this, Settings.class));
@@ -362,11 +372,14 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
         translationET.startAnimation(animAlpha);
         boolean isRight = false;
         if (answer.equals(userWord)) {
+            putCorrectAnswers(getCorrectAnswers() + 1);
+            putAnswers(getAnswers() + 1);
             isRight = true;
             translationET.setBackgroundResource(R.color.colorKnowButton);
             testEnWords.remove(answer);
             testRuWords.remove(wordValueTV.getText().toString());
         } else {
+            putAnswers(getAnswers() + 1);
             translationET.setBackgroundResource(R.color.colorDKnowButton);
             testEnWords.remove(answer);
             testRuWords.remove(wordValueTV.getText().toString());
@@ -495,12 +508,32 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
     }
 
     private void putRussianSet(Set<String> set) {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putStringSet(APP_PREFERENCES3, set);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putStringSet(APP_PREFERENCES3, set);
+            editor.apply();
+        }
+
+        private Set<String> getRussianSet() {
+            return sharedPreferences.getStringSet(APP_PREFERENCES3, new HashSet<String>());
+    }
+
+    private void putAnswers(int number) {
+        SharedPreferences.Editor editor = sharedPreferences4.edit();
+        editor.putInt(APP_PREFERENCES4, number);
         editor.apply();
     }
 
-    private Set<String> getRussianSet() {
-        return sharedPreferences.getStringSet(APP_PREFERENCES3, new HashSet<String>());
+    private int getAnswers() {
+        return sharedPreferences4.getInt(APP_PREFERENCES4, 0);
+    }
+
+    private void putCorrectAnswers(int number) {
+        SharedPreferences.Editor editor = sharedPreferences5.edit();
+        editor.putInt(APP_PREFERENCES5, number);
+        editor.apply();
+    }
+
+    private int getCorrectAnswers() {
+        return sharedPreferences5.getInt(APP_PREFERENCES5, 0);
     }
 }
