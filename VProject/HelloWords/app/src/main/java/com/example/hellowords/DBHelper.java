@@ -19,8 +19,10 @@ public class DBHelper extends SQLiteOpenHelper {
     private final Context mContext;
     private boolean mNeedUpdate = false;
 
-    public DBHelper (Context context) {
+
+    public DBHelper (Context context, String dbName) {
         super(context, DB_NAME, null, DB_VERSION);
+        //DB_NAME = dbName;
         if (android.os.Build.VERSION.SDK_INT >= 17)
             DB_PATH = context.getApplicationInfo().dataDir + "/databases/";
         else
@@ -31,6 +33,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         this.getReadableDatabase();
     }
+
 
     public void updateDataBase() throws IOException {
         if (mNeedUpdate) {

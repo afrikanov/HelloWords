@@ -3,6 +3,7 @@ package com.example.hellowords;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -46,17 +47,27 @@ import ru.yandex.speechkit.Voice;
 public class MainActivity extends AppCompatActivity implements VocalizerListener {
     private static ArrayList<String> enWords = new ArrayList<>();
     private static ArrayList<String> ruWords = new ArrayList<>();
-    private static int knowWordsMaxSize = 20;
-    private static int dknowWordsMaxSize = 1;
+    private static int knowWordsMaxSize = 10;
+    private static int dknowWordsMaxSize = 5;
     Cursor cursor = null;
     String selectSQL = null;
     int cursorPosition = 0;
+    private SharedPreferences sharedPreferences;
+    public static final String APP_PREFERENCES = "isTest";
+    private int isTest = 0;
+    private SharedPreferences sharedPreferences2;
+    public static final String APP_PREFERENCES2 = "EnglishWords";
+    private SharedPreferences sharedPreferences3;
+    public static final String APP_PREFERENCES3 = "RussianWords";
+    private static int window = 1;
     private TextView wordTV;
     private Button knowButton;
     private Button dknowButton;
     int position = 0;
-    private static Set<String> knowWords = new HashSet<>();
-    private static Set<String> dknowWords = new HashSet<>();
+    private static Set<String> knowEnWords = new HashSet<>();
+    private static Set<String> knowRuWords = new HashSet<>();
+    private static Set<String> dknowEnWords = new HashSet<>();
+    private static Set<String> dknowRuWords = new HashSet<>();
     private static HashMap<String, Integer> whatSelected = new HashMap<>();
     private LinearLayout preparing;
     private LinearLayout testing;
@@ -66,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
     Button nextWordButton;
     TextView wordValueTV;
     EditText translationET;
+    TextView translateTV;
     private static int newWordsAmount = 0;
     private int repetitionWordsAmount = 0;
     //private static final String API_KEY_SPEECH_KIT = "c91e372b-c94d-46ef-8020-b2f2bbb16aa1";
@@ -79,7 +91,6 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         preparing = findViewById(R.id.preparing);
         testing = findViewById(R.id.testing);
         preparing.setVisibility(View.VISIBLE);
@@ -87,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
         wordTV = findViewById(R.id.textWord);
         knowButton = findViewById(R.id.knowButton);
         dknowButton = findViewById(R.id.dknowButton);
-        mDBHelper = new DBHelper(this);
+        mDBHelper = new DBHelper(this, "wordsDB.db");
         try {
             mDBHelper.updateDataBase();
         } catch (IOException mIOException) {
@@ -101,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
         }
 
         selectSQL = "SELECT * FROM dictionary WHERE _id BETWEEN 1 AND 1";
-        cursorPosition = 10;
+        cursorPosition = 1;
         cursor = mDB.rawQuery(selectSQL, null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -109,32 +120,38 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
             ruWords.add(cursor.getString(2));
             cursor.moveToNext();
         }
-
-        showCurrent();
-
-        knowButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String wordNow = wordTV.getText().toString();
-                knowWords.add(wordNow);
-                whatSelected.put(wordNow, 1);
-                goNext(v);
-            }
-        });
-
         listenWordButton = findViewById(R.id.listenWordButton);
         nextWordButton = findViewById(R.id.nextWordButton);
         checkButton = findViewById(R.id.checkButton);
         hintButton = findViewById(R.id.hint);
         wordValueTV = findViewById(R.id.wordValueTV);
         translationET = findViewById(R.id.translationET);
+        translateTV = findViewById(R.id.translateTV);
+        sharedPreferences =  getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+        sharedPreferences2 =  getSharedPreferences(APP_PREFERENCES2, Context.MODE_PRIVATE);
+        sharedPreferences3 =  getSharedPreferences(APP_PREFERENCES3, Context.MODE_PRIVATE);
+        isTest = getInt();
+        if (isTest == 1) {
+            startTesting(getEnglishSet(), getRussianSet());
+        }
+        showCurrent();
+
+        knowButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String wordNow = wordTV.getText().toString();
+                knowEnWords.add(wordNow);
+                knowRuWords.add(translateTV.getText().toString());
+                goNext(v);
+            }
+        });
 
         dknowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String wordNow = wordTV.getText().toString();
-                dknowWords.add(wordNow);
-                whatSelected.put(wordNow, 0);
+                dknowEnWords.add(wordNow);
+                dknowRuWords.add(translateTV.getText().toString());
                 goNext(v);
             }
         });
@@ -147,9 +164,9 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
                     ++position;
                     showCurrent();
                 } else if (position == enWords.size() - 1) {
-                    if (knowWords.size() > knowWordsMaxSize) {
+                    if (knowEnWords.size() > knowWordsMaxSize) {
                         //... start Activity
-                    } else if (dknowWords.size() > dknowWordsMaxSize) {
+                    } else if (dknowEnWords.size() > dknowWordsMaxSize) {
                         //... start Activity
                     } else {
                         downloadMoreWords();
@@ -216,21 +233,41 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
     private void goNext(@NonNull View view) {
         final Animation animAlpha = AnimationUtils.loadAnimation(getBaseContext(), R.anim.alpha);
         view.startAnimation(animAlpha);
-        if (position < enWords.size() - 1) {
-            ++position;
-            showCurrent();
-        } else if (position == enWords.size() - 1) {
-            if (knowWords.size() >= knowWordsMaxSize) {
-                repetitionWordsAmount += knowWordsMaxSize;
-                startTesting();
-            } else if (dknowWords.size() >= dknowWordsMaxSize) {
-                newWordsAmount += dknowWordsMaxSize;
-                startTesting();
-            } else {
+        if (knowEnWords.size() >= knowWordsMaxSize) {
+            repetitionWordsAmount += knowWordsMaxSize;
+            isTest = 1;
+            putInt(isTest);
+            putEnglishSet(knowEnWords);
+            putRussianSet(knowRuWords);
+            startTesting(knowEnWords, knowRuWords);
+            knowEnWords.clear();
+            knowRuWords.clear();
+            enWords.remove(0);
+            ruWords.remove(0);
+            if (enWords.isEmpty()) {
                 downloadMoreWords();
-                ++position;
-                showCurrent();
             }
+            showCurrent();
+        } else if (dknowEnWords.size() >= dknowWordsMaxSize) {
+            newWordsAmount += dknowWordsMaxSize;
+            isTest = 1;
+            putInt(isTest);
+            putEnglishSet(knowEnWords);
+            putRussianSet(knowRuWords);
+            startTesting(dknowEnWords, dknowRuWords);
+            dknowEnWords.clear();
+            dknowRuWords.clear();
+            enWords.remove(0);
+            ruWords.remove(0);
+            if (enWords.isEmpty()) {
+                downloadMoreWords();
+            }
+            showCurrent();
+        } else {
+            downloadMoreWords();
+            enWords.remove(0);
+            ruWords.remove(0);
+            showCurrent();
         }
         String wordNow = wordTV.getText().toString();
         if (whatSelected.getOrDefault(wordNow, -1) == 1) {
@@ -255,7 +292,8 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
     private void showCurrent() {
         final Animation animAlpha = AnimationUtils.loadAnimation(this, R.anim.alpha);
         wordTV.startAnimation(animAlpha);
-        wordTV.setText(enWords.get(position));
+        translateTV.setText(ruWords.get(0));
+        wordTV.setText(enWords.get(0));
     }
 
     @Override
@@ -265,31 +303,32 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
     }
 
     int hintsAmount = 0;
-
-    ArrayList<String> enWordsCollection;
-    ArrayList<String> ruWordsCollection;
     String enWordNow;
     String ruWordNow;
 
-    private void startTesting() {
+    ArrayList<String> testEnWords = new ArrayList<>();
+    ArrayList<String> testRuWords = new ArrayList<>();
+
+    private void startTesting(Set<String> testEnWordsSet, Set<String> testRuWordsSet) {
         listenWordButton.setVisibility(View.GONE);
         preparing.setVisibility(View.GONE);
+        nextWordButton.setVisibility(View.GONE);
         testing.setVisibility(View.VISIBLE);
-        enWordsCollection = new ArrayList<>(enWords);
-        ruWordsCollection = new ArrayList<>(ruWords);
-        for (String e : ruWordsCollection) {
-            System.out.print(e + " ");
-        }
-        enWordNow = enWordsCollection.get(0);
-        ruWordNow = ruWordsCollection.get(0);
-        enWordsCollection.remove(enWordNow);
-        ruWordsCollection.remove(ruWordNow);
+        hintButton.setVisibility(View.VISIBLE);
+        checkButton.setVisibility(View.VISIBLE);
+        translationET.setBackgroundResource(R.color.colorDefaultButton);
+        translationET.setText("");
+        hintsAmount = 0;
+        testEnWords = new ArrayList<>(testEnWordsSet);
+        testRuWords = new ArrayList<>(testRuWordsSet);
+        enWordNow = testEnWords.get(0);
+        ruWordNow = testRuWords.get(0);
+        testEnWords.remove(0);
+        testRuWords.remove(0);
         wordValueTV.setText(ruWordNow);
-
         hintButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println(enWordNow.charAt(0));
                 if (hintsAmount == 0) {
                     translationET.setText(enWordNow.substring(0, 1));
                     ++hintsAmount;
@@ -308,11 +347,9 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
                 showAnswer(enWordNow);
             }
         });
-        System.out.println("END");
     }
 
     private void showAnswer(String answer) {
-        System.out.println(enWordsCollection.size());
         String userWord = translationET.getText().toString();
         translationET.setText(answer);
         translationET.setEnabled(false);
@@ -323,20 +360,18 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
 
         final Animation animAlpha = AnimationUtils.loadAnimation(getBaseContext(), R.anim.alpha);
         translationET.startAnimation(animAlpha);
+        boolean isRight = false;
         if (answer.equals(userWord)) {
+            isRight = true;
             translationET.setBackgroundResource(R.color.colorKnowButton);
-            enWordsCollection.remove(answer);
-            ruWordsCollection.remove(wordValueTV.getText().toString());
+            testEnWords.remove(answer);
+            testRuWords.remove(wordValueTV.getText().toString());
         } else {
             translationET.setBackgroundResource(R.color.colorDKnowButton);
-            enWordsCollection.remove(answer);
-            ruWordsCollection.remove(wordValueTV.getText().toString());
-            enWordsCollection.add(answer);
-            ruWordsCollection.add(wordValueTV.getText().toString());
-            for (String e : ruWordsCollection) {
-                System.out.print(e + " ");
-            }
-            System.out.println();
+            testEnWords.remove(answer);
+            testRuWords.remove(wordValueTV.getText().toString());
+            testEnWords.add(answer);
+            testRuWords.add(wordValueTV.getText().toString());
         }
 
         listenWordButton.setOnClickListener(new View.OnClickListener() {
@@ -354,6 +389,7 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
                         .setEmotion(Emotion.GOOD)
                         .setVoice(Voice.ZAHAR)
                         .setAutoPlay(true)
+                        .setSpeed(0.5f)
                         .build();
                 vocalizer.prepare();
                 if (TextUtils.isEmpty(answer)) {
@@ -361,22 +397,29 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
                 } else {
                     vocalizer.synthesize(answer, Vocalizer.TextSynthesizingMode.INTERRUPT);
                 }
-                System.out.println(isOnline(getApplicationContext()));
             }
         });
 
+        boolean finalIsRight = isRight;
         nextWordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (ruWordsCollection.size() == 0) {
+                if (finalIsRight) {
+                    Intent intent = new Intent(MainActivity.this, RecognizerActivity.class);
+                    intent.putExtra("word", answer);
+                    startActivity(intent);
+                }
+                if (testRuWords.size() == 0) {
                     Toast.makeText(getApplicationContext(), "Молодец! За сегодня ты узнал " + newWordsAmount + " новых слов и повторил " + repetitionWordsAmount + " слов.", Toast.LENGTH_SHORT).show();
+                    isTest = 0;
+                    putInt(0);
                     startLearning();
                     return;
                 }
-                enWordNow = enWordsCollection.get(0);
-                ruWordNow = ruWordsCollection.get(0);
-                enWordsCollection.remove(enWordNow);
-                ruWordsCollection.remove(ruWordNow);
+                enWordNow = testEnWords.get(0);
+                ruWordNow = testRuWords.get(0);
+                testEnWords.remove(enWordNow);
+                testRuWords.remove(ruWordNow);
                 wordValueTV.setText(ruWordNow);
                 translationET.setBackgroundResource(R.color.colorDefaultButton);
                 translationET.setText("");
@@ -388,7 +431,6 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
                 hintsAmount = 0;
             }
         });
-
     }
 
     private void startLearning() {
@@ -431,5 +473,34 @@ public class MainActivity extends AppCompatActivity implements VocalizerListener
             return true;
         }
         return false;
+    }
+    private void putInt(int number) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(APP_PREFERENCES, number);
+        editor.apply();
+    }
+
+    private int getInt() {
+        return sharedPreferences.getInt(APP_PREFERENCES, 0);
+    }
+
+    private void putEnglishSet(Set<String> set) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putStringSet(APP_PREFERENCES2, set);
+        editor.apply();
+    }
+
+    private Set<String> getEnglishSet() {
+        return sharedPreferences.getStringSet(APP_PREFERENCES2, new HashSet<String>());
+    }
+
+    private void putRussianSet(Set<String> set) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putStringSet(APP_PREFERENCES3, set);
+        editor.apply();
+    }
+
+    private Set<String> getRussianSet() {
+        return sharedPreferences.getStringSet(APP_PREFERENCES3, new HashSet<String>());
     }
 }

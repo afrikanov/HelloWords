@@ -16,6 +16,12 @@
         android:visibility="gone">
 
         <TextView
+            android:id="@+id/translateTV"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+        <TextView
             android:id="@+id/textWord"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -62,6 +68,7 @@
         android:layout_weight="1"
         android:background="@color/colorDefaultButton"
         android:orientation="vertical"
+        android:visibility="visible"
         android:weightSum="100">
 
         <TextView

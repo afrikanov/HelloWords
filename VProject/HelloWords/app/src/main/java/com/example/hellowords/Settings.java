@@ -9,8 +9,6 @@ import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 public class Settings extends AppCompatActivity {
@@ -18,16 +16,11 @@ public class Settings extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_statistics);
+        setContentView(R.layout.activity_settings);
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView)
                 findViewById(R.id.bottom_navigation);
-        List<SettingsElement> list = new ArrayList<>();
-        list.add(new SettingsElement(1, "World"));
-        list.add(new SettingsElement(2, "Study"));
-        list.add(new SettingsElement(3, "Animals"));
-        SettingsList counterList = new SettingsList(findViewById(R.id.list));
-        counterList.setStatistics(list);
+
         bottomNavigationView.setSelectedItemId(R.id.action_settings);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(
